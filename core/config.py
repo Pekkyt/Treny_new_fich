@@ -9,5 +9,10 @@ class Settings(BaseSettings):
     algorithm: str
     access_token_expire_minutes: int
 
+    rabbitmq_host: str
+    rabbitmq_port: int
+    rabbitmq_user: str
+    rabbitmq_password: str
+
 
 settings = Settings()

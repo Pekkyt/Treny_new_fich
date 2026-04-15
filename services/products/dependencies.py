@@ -1,6 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import Depends, status, HTTPException, Path
-
 from core.models import Product
 from core.models.user import User
 from core.models.db_helper import db_helper
@@ -28,3 +27,18 @@ async def get_current_user_product(
             detail="You do not have access to this product",
         )
     return product
+
+
+def send_email_with_created_order(
+    user_email: str,
+    product_id: int,
+):
+    print(
+        f"Письмо о создании продукта {product_id} было отправлено на почту {user_email}"
+    )
+
+
+def report_created_product(product_id: int, product_price: int, user_id: int):
+    print(
+        f"Заказ {product_id} на сумму {product_price} руб. был создан пользователем {user_id}"
+    )
