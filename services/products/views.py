@@ -113,3 +113,27 @@ async def create_product(
             continue
         except Exception as e:
             print(f"Ошибка обработки задачи: {e}")"""
+
+
+@router.post("/orders/", status_code=status.HTTP_201_CREATED)
+async def create_order():
+    # данные из бд типо
+    product_id = 3
+    product_price = 1000
+    user_id = 10
+    email = "me@gmail.com"
+
+    producer.send_product_task(
+        task="send_email",
+        product_id=product_id,
+        data={"user_email": email},
+    )
+    producer.send_product_task(
+        task="report",
+        product_id=product_id,
+        data={
+            "user_id": user_id,
+            "product_price": str(product_price),
+        },
+    )
+    return {"product_id": product_id, "status_order": "created"}
