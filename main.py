@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request
 import time
 import logging
+import sentry_sdk
 
 """from services.products.views import process_queue"""
 from services.users.views import router as users_router

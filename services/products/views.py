@@ -12,6 +12,7 @@ from .dependencies import (
     report_created_product,
 )
 from services.queue_producer import producer
+from services.log_service.logger import logger_service
 
 router = APIRouter(tags=["PRODUCTS"], prefix="/products")
 
@@ -23,10 +24,25 @@ async def read_my_products(
     session: AsyncSession = Depends(db_helper.session_dependencies),
     current_user: User = Depends(get_current_user),
 ):
-    products = await crud.get_products_by_owner(
-        session=session, owner_id=current_user.id
+    logger_service.info(
+        f"Считавание продуктов пользователя", current_user=current_user.id
     )
-    return products
+    try:
+        products = await crud.get_products_by_owner(
+            session=session, owner_id=current_user.id
+        )
+        logger_service.info(
+            f"Пользователь {current_user.id} прочитал свои {len(products)} продуктов"
+        )
+        return products
+    except Exception as e:
+        logger_service.error(
+            "Пользователь не смог получить свои продукты", error=str(e)
+        )
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e),
+        )
 
 
 @router.patch("/{product_id}", response_model=ProductRead)
@@ -54,11 +70,17 @@ async def create_product(
     session: AsyncSession = Depends(db_helper.session_dependencies),
     current_user: User = Depends(get_current_user),
 ):
-    product = await crud.create_product(
-        session=session,
-        product_in=product_in,
-        owner_id=current_user.id,
-    )
+    logger_service.info(f"Создание продукта пользователя с id = {current_user.id}")
+    try:
+        product = await crud.create_product(
+            session=session,
+            product_in=product_in,
+            owner_id=current_user.id,
+        )
+        logger_service.info(f"Продукт создан {product.id}")
+    except Exception as error:
+        logger_service.error(f"Ошибка создания продукта", error=str(error))
+        raise HTTPException(status_code=500, detail=str(error))
 
     # отправка задач через обычную очередь
     """queue_task.put(
