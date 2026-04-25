@@ -137,3 +137,11 @@ async def create_order():
         },
     )
     return {"product_id": product_id, "status_order": "created"}
+
+
+@router.get("/test/{user_id}/", status_code=status.HTTP_200_OK)
+async def get_user_products(
+    user_id: int,
+    session: AsyncSession = Depends(db_helper.session_dependencies),
+):
+    return await crud.get_products_by_owner(owner_id=user_id, session=session)
