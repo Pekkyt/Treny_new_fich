@@ -24,10 +24,11 @@ jobs:
         run: |
           poetry install --no-root
 
+      - name: Run tests
+        run: |
+          poetry run pytest
+
       - name: Lint with ruff
         run: |
           poetry run ruff check .
 
-      - name: Run tests
-        run: |
-          poetry run pytest
