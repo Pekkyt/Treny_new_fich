@@ -53,7 +53,7 @@ jobs:
 
       - name: Run tests with coverage
         env:
-          DB_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/app_test
+          DB_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/app_db
           SECRET_KEY: test_secret
           ALGORITHM: HS256
           ACCESS_TOKEN_EXPIRE_MINUTES: "30"
@@ -79,10 +79,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Deploy to production
-        run: |
-          echo "Deploying to production..."
-          echo "Here will be deploy commands"
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/app:latest
 
           
         
