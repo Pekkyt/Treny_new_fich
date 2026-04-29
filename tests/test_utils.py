@@ -11,6 +11,17 @@ def product():
     }
 
 
+@pytest.fixture
+def base_price():
+    return 700
+
+
+def test_without_discount(base_price):
+    from utils.utils_function_for_tests import calculate_discount
+
+    assert calculate_discount(base_price) == 0
+
+
 @pytest.mark.parametrize(
     "order_total,expected_discount",
     [
